@@ -8,7 +8,8 @@
 local function log(level, content)
   if level == "fatal" then
     level = "#R[dm][fatal]"
-    Game:msgBox("#RDev-Mini Error:\n\t" .. content .. "#n") -- Show error message.
+    -- Show error message.
+    Game:msgBox("#RDev-Mini Error:\n\t" .. content .. "#n")
   elseif level == "error" then
     level = "#R[dm][error]"
   elseif level == "warning" then
@@ -33,7 +34,11 @@ end
 
 -- Define vars.
 local _dm_type = "PixelPainting"
-local _dm_position = { x = [[$POSITION_X]], y = [[$POSITION_Y]], z = [[$POSITION_Z]] }
+local _dm_position = {
+  x = [[$POSITION_X]],
+  y = [[$POSITION_Y]],
+  z = [[$POSITION_Z]]
+}
 local _dm_size = { width = [[$SIZE_WIDTH]], y = [[$SIZE_HEIGHT]] }
 local _dm_painting = ""
 local _dm_block_id = [[$BLOCK_ID]]
