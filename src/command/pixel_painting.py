@@ -1,10 +1,10 @@
 """
-Create a block pixel painting in the Miniworld map.
+Create a block Pixel Painting in the Miniworld map.
 """
 
 
 
-from typing import Union
+from typing import List, Tuple, Union
 
 
 import PIL.Image
@@ -13,15 +13,70 @@ import PIL.Image
 
 # Pixel painting project class.
 class PixelPainting:
-    # Image file.
+    _path:Union[str, None] = None
+    _image = None
     _pixmap = None
-    def __init__(self, filename:str) -> None:
-        image = PIL.Image.open(filename)
-        self._pixmap = image.load() # Get image pixmap.
-        image.close()
+    _width:Union[int, None] = None
+    _height:Union[int, None] = None
+    # Coordinates of the lower left corner of the image.
+    _position: Union[Tuple[int, int, int], None]  = None
+    # Lua script.
+    _script:Union[str, None] = None
+    def open(self, filename:str) -> None:
+        # Open file.
+        self._image = PIL.Image.open(filename)
+        # Get attr.
+        self._width = self._image.width
+        self._height = self._image.height
+        # Get image pixmap.
+        self._pixmap = self._image.load()
+        self._path = filename
+        # Close file.
+        self._image.close()
+    def generate_color_map(self) -> List[List[
+            Union[Tuple[int, int, int], None] # Transparent is `None`.
+        ]]:
+        result = []
+        # Get colors.
+        for i in range(self.width)[::-1]:
+            result.append([])
+            for j in range(self.height):
+                result[-1].append(self._pixmap[j, i])
+        return result
     def generate_script(self) -> str:
-        # TODO(KaiKai): Complete this feature.
-        script = ""
-        for i in self._pixmap:
-            for j in i:
-                pass
+        result = ""
+        # Read template script.
+        with open("./assets/template/script/pixel_painting.dev.lua") as file:
+            result = file.read()
+        # Replace keywords.
+        # Keywords looks like `[[$BLOCK_ID]]`.
+        result = result.replace("[[$POSITION_X]]", str(self.position[0]))
+        result = result.replace("[[$POSITION_Y]]", str(self.position[1]))
+        result = result.replace("[[$POSITION_Z]]", str(self.position[2]))
+        result = result.replace("[[$SIZE_WIDTH]]", str(self.width))
+        result = result.replace("[[$SIZE_HEIGHT]]", str(self.height))
+        # Replace pixmap data.
+        result = result.replace("[[$BLOCK_ID]]", str(666)) # Constant.
+        for i in self.generate_color_map():
+            pass # TODO(KaiKai): Convert Python list to Lua table.
+        return result
+    @property
+    def width(self) -> Union[int, None]:
+        return self._width
+    @property
+    def height(self) -> Union[int, None]:
+        return self._height
+    @property
+    def position(self) -> Union[Tuple[int, int, int], None]:
+        return self._position
+    @position.setter
+    def position(self, position:Tuple[int, int, int]) -> None:
+        self._position = position
+    @property
+    def script(self) -> str:
+        if self._script is None:
+            result = self.generate_script()
+            self._script = result
+            return result
+        else:
+            return self._script
