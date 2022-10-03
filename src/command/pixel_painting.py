@@ -33,9 +33,19 @@ class PixelPainting:
         self._path = filename
         # Close file.
         self._image.close()
+    def _to_hex_rgb(self, color:Tuple[int, int, int]):
+        """
+        Convert color tuple to RGB hex code.
+        """
+        return hex(color[0] * 0x10000 + color[1] * 0x100 + color[2])
     def generate_color_map(self) -> List[List[
             Union[Tuple[int, int, int], None] # Transparent is `None`.
         ]]:
+        """
+        Notice:
+            Start at the bottom left corner of the pixmap,
+              working from left to right, and then from bottom to top.
+        """
         result = []
         # Get colors.
         for i in range(self.width)[::-1]:
@@ -57,8 +67,18 @@ class PixelPainting:
         result = result.replace("[[$SIZE_HEIGHT]]", str(self.height))
         # Replace pixmap data.
         result = result.replace("[[$BLOCK_ID]]", str(666)) # Constant.
-        for i in self.generate_color_map():
-            pass # TODO(KaiKai): Convert Python list to Lua table.
+        color_map = self.generate_color_map()
+        color_str = ""
+        for i in color_map: # Generate color table.
+            color_str += "  {"
+            for j in i:
+                color_str += self._to_hex_rgb(j) + ", "
+            color_str = color_str[:-2] # Delete last `, `.
+            color_str += "},\n" # Next line.
+        color_str = "{\n" + color_str # Start table.
+        color_str = color_str[:-2] # Delete last `,`.
+        color_str += "\n}" # End table.
+        result = result.replace("[[$PAITING]]", color_str)
         return result
     @property
     def width(self) -> Union[int, None]:

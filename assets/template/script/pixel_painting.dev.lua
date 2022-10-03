@@ -40,7 +40,7 @@ local _dm_position = {
   z = [[$POSITION_Z]]
 }
 local _dm_size = { width = [[$SIZE_WIDTH]], y = [[$SIZE_HEIGHT]] }
-local _dm_painting = ""
+local _dm_painting = [[$PAITING]]
 local _dm_block_id = [[$BLOCK_ID]]
 
 ---Place a block.
