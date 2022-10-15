@@ -9,7 +9,7 @@ local function log(level, content)
   if level == "fatal" then
     level = "#R[dm][fatal]"
     -- Show error message.
-    Game:msgBox("#RDev-Mini Error:\n\t" .. content .. "#n")
+    Game:msgBox("#RDev-Mini-cli Error:\n\t" .. content .. "#n")
   elseif level == "error" then
     level = "#R[dm][error]"
   elseif level == "warning" then
@@ -56,7 +56,6 @@ end
 
 
 local function make()
-  
   local height = _dm_size.height
   for x, tab in pairs(_dm_painting) do
     for y, id in pairs(tab) do
@@ -76,4 +75,7 @@ local function main()
   make()
   log("info", "Pixel Painting created successfully.")
 end
+
+
+
 ScriptSupportEvent:registerEvent("Game.Start", main)
