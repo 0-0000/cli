@@ -39,7 +39,7 @@ local _dm_position = {
   y = [[$POSITION_Y]],
   z = [[$POSITION_Z]]
 }
-local _dm_size = { width = [[$SIZE_WIDTH]], y = [[$SIZE_HEIGHT]] }
+local _dm_size = { width = [[$SIZE_WIDTH]], height = [[$SIZE_HEIGHT]] }
 local _dm_painting = [[$PAITING]]
 local _dm_block_id = [[$BLOCK_ID]]
 
@@ -49,16 +49,31 @@ local _dm_block_id = [[$BLOCK_ID]]
 ---@param position table Given x, y, z.
 ---@return boolean result Create successfully.
 local function place_block(id, color, position)
+  ---@todo(KaiKai) Check whether here is a block, and return false if there is.
   return (Block:placeBlock(id, position.x, position.y, position.z, 5, color)
           == ErrorCode.OK)
 end
 
 
+local function make()
+  
+  local height = _dm_size.height
+  for x, tab in pairs(_dm_painting) do
+    for y, id in pairs(tab) do
+      place_block(_dm_block_id, id, {
+        x = _dm_position.x + x - 1,
+        y = _dm_position.y + y - 1,
+        z = _dm_position.z
+      })
+    end
+  end
+end
+
 
 ---Entry.
 local function main()
   log("info", "Start creating Pixel Painting.")
-  ---@todo(KaiKai) Traverse image data to generate blocks.
+  make()
   log("info", "Pixel Painting created successfully.")
 end
 ScriptSupportEvent:registerEvent("Game.Start", main)
