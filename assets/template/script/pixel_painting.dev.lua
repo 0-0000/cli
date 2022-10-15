@@ -57,8 +57,8 @@ end
 
 local function make()
   local height = _dm_size.height
-  for x, tab in pairs(_dm_painting) do
-    for y, id in pairs(tab) do
+  for y, tab in pairs(_dm_painting) do
+    for x, id in pairs(tab) do
       place_block(_dm_block_id, id, {
         x = _dm_position.x + x - 1,
         y = _dm_position.y + y - 1,
@@ -73,6 +73,7 @@ end
 local function main()
   log("info", "Start creating Pixel Painting.")
   make()
+  ---@todo(KaiKai) Add fault tolerance mechanism.
   log("info", "Pixel Painting created successfully.")
 end
 
