@@ -2,12 +2,16 @@
 
 
 
+local _dm_exit = false
+
 ---Print standard log
 ---@param level string Log type.
 ---@param content string Log content
 local function log(level, content)
   if level == "fatal" then
     level = "#R[dm][fatal]"
+    -- Flag as exit.
+    _dm_exit = true
     -- Show error message.
     Game:msgBox("#RDev-Mini-cli Error:\n\t" .. content .. "#n")
   elseif level == "error" then
@@ -49,7 +53,10 @@ local _dm_block_id = [[$BLOCK_ID]]
 ---@param position table Given x, y, z.
 ---@return boolean result Create successfully.
 local function place_block(id, color, position)
-  ---@todo(KaiKai) Check whether here is a block, and return false if there is.
+  local _, block = Block:getBlockID(position.x, position.y, position.z)
+  if block then
+    return false
+  end
   return (Block:placeBlock(id, position.x, position.y, position.z, 5, color)
           == ErrorCode.OK)
 end
@@ -59,22 +66,32 @@ local function make()
   local height = _dm_size.height
   for y, tab in pairs(_dm_painting) do
     for x, id in pairs(tab) do
-      place_block(_dm_block_id, id, {
+      local result = place_block(_dm_block_id, id, {
         x = _dm_position.x + x - 1,
         y = _dm_position.y + y - 1,
         z = _dm_position.z
       })
+      if not result then
+        log("warning", string.format("Failed to place block on (%d, %d, %d)",
+                                     x, y, _dm_position.z))
+      end
     end
   end
 end
 
 
+-- Error handle of `main`.
+local function on_error(err)
+  log("fatal", err)
+end
+
 ---Entry.
 local function main()
   log("info", "Start creating Pixel Painting.")
-  make()
-  ---@todo(KaiKai) Add fault tolerance mechanism.
-  log("info", "Pixel Painting created successfully.")
+  xpcall(make, on_error)
+  if not _dm_exit then
+    log("info", "Pixel Painting created successfully.")
+  end
 end
 
 
