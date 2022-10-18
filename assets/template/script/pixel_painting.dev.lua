@@ -54,7 +54,7 @@ local _dm_block_id = [[$BLOCK_ID]]
 ---@return boolean result Create successfully.
 local function place_block(id, color, position)
   local _, block = Block:getBlockID(position.x, position.y, position.z)
-  if block then
+  if block ~= 0 then
     return false
   end
   return (Block:placeBlock(id, position.x, position.y, position.z, 5, color)
