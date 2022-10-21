@@ -26,24 +26,6 @@ class PixelPainting(BaseMiniScript):
     _width:Union[int, None] = None
     _height:Union[int, None] = None
     _position: Union[Tuple[int, int, int], None]  = None
-    """Coordinates of the lower left corner of the image."""
-    def open(self, filename:str) -> None:
-        """Generate `Miniworld Lua Script` by self args.
-
-        Args:
-            filename: Image file path.
-
-        Raises:
-            OSError: Cannot open image file.
-        """
-        self._image = PIL.Image.open(filename).convert("RGB") # To RGB image.
-        self._width = self._image.width
-        self._height = self._image.height
-        self._pixmap = self._image.load() # To pixmap.
-        self._path = filename
-        self._image.close()
-        self._position = (0, 0, 0)
-        self._init = True
     def _generate_color_map(self) -> List[List[
             Union[Tuple[int, int, int], None]
             # TODO(KaiKai):Transparent is `None`.
@@ -75,6 +57,24 @@ class PixelPainting(BaseMiniScript):
             for j in range(self.height):
                 result[-1].append(self._pixmap[j, i])
         return result
+    """Coordinates of the lower left corner of the image."""
+    def open(self, filename:str) -> None:
+        """Open and read image file.
+
+        Args:
+            filename: Image file path.
+
+        Raises:
+            OSError: Cannot open (or read) image file.
+        """
+        self._image = PIL.Image.open(filename).convert("RGB") # To RGB image.
+        self._width = self._image.width
+        self._height = self._image.height
+        self._pixmap = self._image.load() # To pixmap.
+        self._path = filename
+        self._image.close()
+        self._position = (0, 0, 0)
+        self._init = True
     def generate_script(self) -> str:
         """Generate the final script, ignore cache.
 
