@@ -43,6 +43,14 @@ def virtual(func):
     return inner
 
 
+
+class UninitializedError(Exception):
+    """The function that throws this exception,
+        requires a properly initialized instance.
+    """
+    pass
+
+
 # This class is reserved for future use.
 class Base(object):
     pass
@@ -51,8 +59,6 @@ class Base(object):
 # Inheriting this class represents that
 #     the goal of the inheritor is to generate `Miniworld Lua Script`.
 class BaseMiniScript(Base):
-    _init:bool = False
-    """Whether the instance was initialized successfully."""
     _script:Union[str, None] = None
     """Cached script."""
     @virtual
@@ -61,9 +67,6 @@ class BaseMiniScript(Base):
 
         Returns:
             Generated script.
-
-        Raises:
-            ValueError: If no available port is found.
         """
         return ""
     @property

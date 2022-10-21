@@ -10,6 +10,7 @@ from typing import List, Tuple, Union
 import PIL.Image
 
 
+from base import UninitializedError
 from base import to_hex_rgb
 from base import BaseMiniScript
 
@@ -46,10 +47,11 @@ class PixelPainting(BaseMiniScript):
         ```
 
         Raises:
-            ValueError("uninitialized"): Instance uninitialized.
+            UninitializedError.
         """
         if not self._init:
-            raise ValueError("uninitialized")
+            # TODO(KaiKai): Make a custom exception.
+            raise UninitializedError()
         result = []
         # Get colors.
         for i in range(self.width)[::-1]:
@@ -73,8 +75,8 @@ class PixelPainting(BaseMiniScript):
         self._pixmap = self._image.load() # To pixmap.
         self._path = filename
         self._image.close()
-        self._position = (0, 0, 0)
         self._init = True
+        self._script = None # Clear old script cache.
     def generate_script(self) -> str:
         """Generate the final script, ignore cache.
 
@@ -82,11 +84,11 @@ class PixelPainting(BaseMiniScript):
             Generated script.
 
         Raises:
-            ValueError("uninitialized"): Instance uninitialized.
+            UninitializedError.
             OSError: Cannot open template script, please check permission.
         """
-        if not self._init:
-            raise ValueError("uninitialized")
+        if self._pixmap is None or self._position is None:
+            raise UninitializedError()
         result = ""
         # Read template script.
         with open("./assets/template/script/pixel_painting.dev.lua") as f:
@@ -123,4 +125,6 @@ class PixelPainting(BaseMiniScript):
         return self._position
     @position.setter
     def position(self, position:Tuple[int, int, int]) -> None:
-        self._position = position
+        self._script = None
+        self._position = position # Clear old script cache.
+        # Maybe we can only update some code that needs to be updated here?
