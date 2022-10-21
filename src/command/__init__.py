@@ -5,3 +5,4 @@ This is the core library file,
 
 
 
+import pixel_painting
